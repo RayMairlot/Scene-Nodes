@@ -17,28 +17,43 @@ class GraphScene(bpy.types.Operator):
         #Stops scenes from being deleted when nodes are cleared
         context.scene.graphing = True
         
-        bpy.data.node_groups['NodeTree'].nodes.clear()           
+        nodeGroup = bpy.data.node_groups['NodeTree']
+        
+        nodeGroup.nodes.clear()           
 
         for sceneIndex, scene in enumerate(bpy.data.scenes):
             
-            newSceneNode = bpy.data.node_groups['NodeTree'].nodes.new('SceneNodeType')
+            newSceneNode = nodeGroup.nodes.new('SceneNodeType')
             newSceneNode.sceneIndex = sceneIndex
             newSceneNode.select = False
             newSceneNode.location[1] = sceneIndex * -newSceneNode.height
             
-            totalHeight = len(scene.objects) * -80
+            totalHeight = len(scene.objects) * -110
             
             for objectIndex, object in enumerate(scene.objects):
                 
-                newObjectNode = bpy.data.node_groups['NodeTree'].nodes.new('ObjectNodeType')
+                newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
                 newObjectNode.objectIndex = objectIndex
                 newObjectNode.select = False
-                newObjectNode.location[1] = (objectIndex * -120) - (totalHeight/2) + 12
-                newObjectNode.location[0] = newSceneNode.width + 30
+                newObjectNode.name = bpy.data.objects[objectIndex].name
                 
                 
-                #node = bpy.context.scene.node_tree.nodes 
-                bpy.data.node_groups['NodeTree'].links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
+                if bpy.data.objects[objectIndex].parent == None:
+                    
+                    newObjectNode.location[1] = (objectIndex * -140) - (totalHeight/2) + 12
+                    newObjectNode.location[0] = newSceneNode.width + 30
+                    
+                    nodeGroup.links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
+                    
+                else:
+                    
+                    parentName = bpy.data.objects[objectIndex].parent.name
+                    
+                    nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
+                    
+                    newObjectNode.location[1] = nodeGroup.nodes[parentName].location[1]
+                    newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 30
+                    
             
         context.scene.graphing = False
             
@@ -167,6 +182,7 @@ class ObjectNode(Node, MyCustomTreeNode):
     def init(self, context):
         self.inputs.new('NodeSocketFloat', "Parent")
         self.outputs.new('NodeSocketFloat', "Child")
+        self.outputs.new('NodeSocketFloat', "Material")
         
 
     # Copy function to initialize a copied node from an existing one.
