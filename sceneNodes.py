@@ -152,7 +152,7 @@ class SceneNode(Node, MyCustomTreeNode):
     def init(self, context):
         #self.inputs.new('CustomSocketType', "Hello")
         self.outputs.new('NodeSocketFloat', "Scene")
-        
+                   
 
     # Copy function to initialize a copied node from an existing one.
     def copy(self, node):
@@ -202,6 +202,25 @@ class ObjectNode(Node, MyCustomTreeNode):
         self.inputs.new('NodeSocketFloat', "Parent")
         self.outputs.new('NodeSocketFloat', "Child")
         self.outputs.new('NodeSocketFloat', "Material")
+        
+
+    def update(self):
+        
+        print("updating node: ", self.name, len(self.inputs[0].links))
+        
+        if len(self.inputs[0].links) != 1:
+            
+            bpy.data.objects[self.objectIndex].parent = None
+            
+        else:
+            
+            parentName = self.inputs[0].links[0].from_node.name
+                                    
+            print(parentName)
+            
+            if parentName != "Scene":
+            
+                bpy.data.objects[self.objectIndex].parent = bpy.data.objects[parentName]
         
 
     # Copy function to initialize a copied node from an existing one.
