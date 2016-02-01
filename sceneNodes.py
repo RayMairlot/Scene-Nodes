@@ -28,8 +28,11 @@ class GraphScene(bpy.types.Operator):
             newSceneNode.select = False
             newSceneNode.location[1] = sceneIndex * -newSceneNode.height
             
-            totalHeight = len(scene.objects) * -110
+            #Only get objects that aren't children themselves
+            totalHeight = len([object for object in scene.objects if object.parent == None]) * -110
             
+            yOffset = 0
+                        
             for objectIndex, object in enumerate(scene.objects):
                 
                 newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
@@ -37,13 +40,15 @@ class GraphScene(bpy.types.Operator):
                 newObjectNode.select = False
                 newObjectNode.name = bpy.data.objects[objectIndex].name
                 
-                
+                                
                 if bpy.data.objects[objectIndex].parent == None:
                     
-                    newObjectNode.location[1] = (objectIndex * -140) - (totalHeight/2) + 12
+                    newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
                     newObjectNode.location[0] = newSceneNode.width + 30
                     
                     nodeGroup.links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
+                    
+                    yOffset = yOffset + 1
                     
                 else:
                     
