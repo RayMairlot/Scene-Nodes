@@ -19,12 +19,20 @@ class GraphScene(bpy.types.Operator):
         
         bpy.data.node_groups['NodeTree'].nodes.clear()           
 
-        for index, scene in enumerate(bpy.data.scenes):
+        for sceneIndex, scene in enumerate(bpy.data.scenes):
             
-            newNode = bpy.data.node_groups['NodeTree'].nodes.new('SceneNodeType')
-            newNode.sceneIndex = index
-            newNode.select = False
-            newNode.location[1] = index * -newNode.height
+            newSceneNode = bpy.data.node_groups['NodeTree'].nodes.new('SceneNodeType')
+            newSceneNode.sceneIndex = sceneIndex
+            newSceneNode.select = False
+            newSceneNode.location[1] = sceneIndex * -newSceneNode.height
+            
+            for objectIndex, object in enumerate(scene.objects):
+                
+                newObjectNode = bpy.data.node_groups['NodeTree'].nodes.new('ObjectNodeType')
+                newObjectNode.objectIndex = objectIndex
+                newObjectNode.select = False
+                newObjectNode.location[1] = objectIndex * (-newObjectNode.height - 20)
+                newObjectNode.location[0] = newSceneNode.width + 30
             
         context.scene.graphing = False
             
@@ -140,6 +148,48 @@ class SceneNode(Node, MyCustomTreeNode):
         return "Scene Node"
 
 
+
+class ObjectNode(Node, MyCustomTreeNode):
+    '''A custom node'''
+    bl_idname = 'ObjectNodeType'
+    bl_label = 'Object'
+    bl_icon = 'OBJECT_DATA'
+
+    objectIndex = bpy.props.IntProperty()
+
+
+    def init(self, context):
+        self.inputs.new('NodeSocketFloat', "Parent")
+        self.outputs.new('NodeSocketFloat', "Child")
+        
+
+    # Copy function to initialize a copied node from an existing one.
+    def copy(self, node):
+        print("Copying from node ", node)
+        
+    # Free function to clean up on removal.
+    def free(self):
+        print("Removing node ", self, ", Goodbye!")
+
+    # Additional buttons displayed on the node.
+    def draw_buttons(self, context, layout):
+
+        layout.prop(bpy.data.objects[self.objectIndex], "name", text="", icon="OBJECT_DATA")
+
+    # Detail buttons in the sidebar.
+    # If this function is not defined, the draw_buttons function is used instead
+#    def draw_buttons_ext(self, context, layout):
+#        layout.prop(self, "myFloatProperty")
+#        # myStringProperty button will only be visible in the sidebar
+#        layout.prop(self, "myStringProperty")
+
+    # Optional: custom label
+    # Explicit user label overrides this, but here we can define a label dynamically
+    def draw_label(self):
+        return "Object Node"
+
+
+
 ### Node Categories ###
 # Node categories are a python system for automatically
 # extending the Add menu, toolbar panels and search operator.
@@ -158,6 +208,7 @@ node_categories = [
     MyNodeCategory("SOMENODES", "Some Nodes", items=[
         # our basic node
         NodeItem("SceneNodeType"),
+        NodeItem("ObjectNodeType"),
         ]),
     MyNodeCategory("OTHERNODES", "Other Nodes", items=[
         # the node item can have additional settings,
@@ -185,6 +236,7 @@ def register():
     bpy.utils.register_class(SceneTree)
     bpy.utils.register_class(MyCustomSocket)
     bpy.utils.register_class(SceneNode)
+    bpy.utils.register_class(ObjectNode)    
     bpy.utils.register_class(GraphScene)
 
     bpy.types.NODE_HT_header.append(SceneNodesHeader)
@@ -199,6 +251,7 @@ def unregister():
     bpy.utils.unregister_class(MyCustomTree)
     bpy.utils.unregister_class(MyCustomSocket)
     bpy.utils.unregister_class(SceneNode)
+    bpy.utils.register_class(ObjectNode)
     bpy.utils.unregister_class(GraphScene)
 
 #if __name__ == "__main__":
