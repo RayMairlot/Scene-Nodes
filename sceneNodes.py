@@ -33,6 +33,10 @@ class GraphScene(bpy.types.Operator):
                 newObjectNode.select = False
                 newObjectNode.location[1] = objectIndex * (-newObjectNode.height - 20)
                 newObjectNode.location[0] = newSceneNode.width + 30
+                
+                
+                #node = bpy.context.scene.node_tree.nodes 
+                bpy.data.node_groups['NodeTree'].links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
             
         context.scene.graphing = False
             
