@@ -21,6 +21,7 @@ class GraphScene(bpy.types.Operator):
         
         nodeGroup.nodes.clear()           
 
+
         for sceneIndex, scene in enumerate(bpy.data.scenes):
             
             newSceneNode = nodeGroup.nodes.new('SceneNodeType')
@@ -32,7 +33,7 @@ class GraphScene(bpy.types.Operator):
             totalHeight = len([object for object in scene.objects if object.parent == None]) * -110
             
             yOffset = 0
-                        
+                          
             for objectIndex, object in enumerate(scene.objects):
                 
                 newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
@@ -54,10 +55,23 @@ class GraphScene(bpy.types.Operator):
                     
                     parentName = bpy.data.objects[objectIndex].parent.name
                     
-                    nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
+                    if len(nodeGroup.nodes[parentName].outputs['Child'].links) == 0:
+                        
+                        newObjectNode.location[1] = nodeGroup.nodes[parentName].location[1]
+                        
+                    else:
+                        
+                        totalChildren = len(nodeGroup.nodes[parentName].outputs['Child'].links)
+                        
+                        lastChild = nodeGroup.nodes[parentName].outputs['Child'].links[totalChildren-1].to_node
+                        
+                        newObjectNode.location[1] = lastChild.location[1] - 140
+                        
                     
-                    newObjectNode.location[1] = nodeGroup.nodes[parentName].location[1]
                     newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 30
+                    
+                    nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
+                                                                                   
                     
             
         context.scene.graphing = False
