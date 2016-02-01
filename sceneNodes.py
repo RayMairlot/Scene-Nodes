@@ -45,7 +45,7 @@ class GraphScene(bpy.types.Operator):
                 if bpy.data.objects[objectIndex].parent == None:
                     
                     newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
-                    newObjectNode.location[0] = newSceneNode.width + 30
+                    newObjectNode.location[0] = newSceneNode.width + 80
                     
                     nodeGroup.links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
                     
@@ -68,7 +68,7 @@ class GraphScene(bpy.types.Operator):
                         newObjectNode.location[1] = lastChild.location[1] - 140
                         
                     
-                    newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 30
+                    newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 80
                     
                     nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
                                                                                    
@@ -215,7 +215,7 @@ class ObjectNode(Node, MyCustomTreeNode):
     # Additional buttons displayed on the node.
     def draw_buttons(self, context, layout):
 
-        layout.prop(bpy.data.objects[self.objectIndex], "name", text="", icon="OBJECT_DATA")
+        layout.prop(bpy.data.objects[self.objectIndex], "name", text="", icon=bpy.data.objects[self.objectIndex].type+"_DATA")
 
     # Detail buttons in the sidebar.
     # If this function is not defined, the draw_buttons function is used instead
