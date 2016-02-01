@@ -26,12 +26,14 @@ class GraphScene(bpy.types.Operator):
             newSceneNode.select = False
             newSceneNode.location[1] = sceneIndex * -newSceneNode.height
             
+            totalHeight = len(scene.objects) * -80
+            
             for objectIndex, object in enumerate(scene.objects):
                 
                 newObjectNode = bpy.data.node_groups['NodeTree'].nodes.new('ObjectNodeType')
                 newObjectNode.objectIndex = objectIndex
                 newObjectNode.select = False
-                newObjectNode.location[1] = objectIndex * (-newObjectNode.height - 20)
+                newObjectNode.location[1] = (objectIndex * -120) - (totalHeight/2) + 12
                 newObjectNode.location[0] = newSceneNode.width + 30
                 
                 
