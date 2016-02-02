@@ -225,6 +225,12 @@ class ObjectNode(Node, MyCustomTreeNode):
             
             bpy.data.objects[self.objectIndex].parent = None
             
+            sceneName = bpy.data.objects[self.objectIndex].users_scene[0].name
+            
+            nodeGroup = bpy.data.node_groups['NodeTree']
+            
+            nodeGroup.links.new(self.inputs[0], nodeGroup.nodes[sceneName].outputs[0])  
+            
         else:
             
             parentName = self.inputs[0].links[0].from_node.name
