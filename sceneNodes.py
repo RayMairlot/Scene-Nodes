@@ -295,12 +295,17 @@ class ObjectNode(Node, MyCustomTreeNode):
             scene.objects.link(newObject)
             scene.update()
             
+            #Link new node with parent of original node
+            nodeGroup = bpy.data.node_groups['NodeTree']
+            oldParentNode = nodeGroup.nodes[object.name].inputs[0].links[0].from_node   
+            nodeGroup.links.new(self.inputs[0], oldParentNode.outputs[0])
+            
             reIndex(scene)            
             
     # Free function to clean up on removal.
     def free(self):
         
-        scene = bpy.data.scene[self.scene]
+        scene = bpy.data.scenes[self.scene]
         
         if not scene.graphing:
              
