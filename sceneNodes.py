@@ -410,18 +410,17 @@ class MyNodeCategory(NodeCategory):
 # all categories in a list
 node_categories = [
     # identifier, label, items list
-    MyNodeCategory("SOMENODES", "Some Nodes", items=[
+    MyNodeCategory("SCENENODES", "Scene Nodes", items=[
         # our basic node
         NodeItem("SceneNodeType"),
-        NodeItem("ObjectNodeType"),
         ]),
-    MyNodeCategory("OTHERNODES", "Other Nodes", items=[
+    MyNodeCategory("OBJECTNODES", "Object Nodes", items=[
         # the node item can have additional settings,
         # which are applied to new nodes
         # NB: settings values are stored as string expressions,
         # for this reason they should be converted to strings using repr()
-        NodeItem("SceneNodeType", label="Node A", settings={
-            "newScene": repr(True)
+        NodeItem("ObjectNodeType", label="Cube", settings={
+            "scene": repr(bpy.context.scene.name)
             })
         ]),
     ]
