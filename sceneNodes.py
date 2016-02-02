@@ -38,6 +38,7 @@ class GraphScene(bpy.types.Operator):
                 
                 newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
                 newObjectNode.objectIndex = objectIndex
+                newObjectNode.scene = scene.name
                 newObjectNode.select = False
                 newObjectNode.name = scene.objects[objectIndex].name
                 newObjectNode.use_custom_color = True
@@ -81,7 +82,7 @@ class GraphScene(bpy.types.Operator):
                         
                         newObjectNode.location[1] = lastChild.location[1] - 140
                         
-                    newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 80
+                    newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 120
                     
                     nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
                  
@@ -105,7 +106,7 @@ class GraphScene(bpy.types.Operator):
                                 newMaterialNode.materialIndex = materialIndex
                                 newMaterialNode.select = False
                                 newMaterialNode.location[1] = newObjectNode.location[1]
-                                newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 80
+                                newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
                                 newMaterialNode.name = bpy.data.materials[materialIndex].name                                
                                 newMaterialNode.use_custom_color = True                   
                                 newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
@@ -244,8 +245,8 @@ class ObjectNode(Node, MyCustomTreeNode):
     bl_icon = 'OBJECT_DATA'
 
     objectIndex = bpy.props.IntProperty()
-
-
+    scene = bpy.props.StringProperty(default=bpy.data.scenes[0].name)
+    
     def init(self, context):
                 
         self.inputs.new('NodeSocketFloat', "Parent")
@@ -256,17 +257,15 @@ class ObjectNode(Node, MyCustomTreeNode):
         
         #print("updating node: ", self.name, len(self.inputs[0].links))
         
-        scene = bpy.data.scenes["Scene"]
+        scene = bpy.data.scenes[self.scene]
         
         if len(self.inputs[0].links) != 1:
                         
             scene.objects[self.objectIndex].parent = None
-            
-            sceneName = scene.objects[self.objectIndex].users_scene[0].name
-            
+                        
             nodeGroup = bpy.data.node_groups['NodeTree']
             
-            nodeGroup.links.new(self.inputs[0], nodeGroup.nodes[sceneName].outputs[0])  
+            nodeGroup.links.new(self.inputs[0], nodeGroup.nodes[scene.name].outputs[0])  
             
         else:
             
@@ -285,13 +284,13 @@ class ObjectNode(Node, MyCustomTreeNode):
         
         object = bpy.data.objects[self.objectIndex]
         
-        scene = bpy.data.objects[self.objectIndex].users_scene[0]
+        scene = bpy.data.scenes[self.scene]
                 
         if object.type == "CAMERA":
             
-            newCamera = bpy.data.cameras.new(object.name)
+            newCamera = scene.cameras.new(object.name)
             
-            newObject = bpy.data.objects.new(object.name, newCamera)
+            newObject = scene.objects.new(object.name, newCamera)
             
             scene.objects.link(newObject)
             scene.update()
@@ -312,7 +311,7 @@ class ObjectNode(Node, MyCustomTreeNode):
     # Additional buttons displayed on the node.
     def draw_buttons(self, context, layout):
         
-        scene = bpy.data.scenes["Scene"]
+        scene = bpy.data.scenes[self.scene]
         
         layout.prop(scene.objects[self.objectIndex], "name", text="", icon=scene.objects[self.objectIndex].type+"_DATA")
 
