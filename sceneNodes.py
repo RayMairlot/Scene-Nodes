@@ -137,33 +137,6 @@ class SceneTree(NodeTree):
     bl_icon = 'SCENE_DATA'
 
 
-# Custom socket type
-class MyCustomSocket(NodeSocket):
-    '''Custom node socket type'''
-    bl_idname = 'CustomSocketType'
-    bl_label = 'Custom Node Socket'
-
-    my_items = [
-        ("DOWN", "Down", "Where your feet are"),
-        ("UP", "Up", "Where your head should be"),
-        ("LEFT", "Left", "Not right"),
-        ("RIGHT", "Right", "Not left")
-    ]
-
-    myEnumProperty = bpy.props.EnumProperty(name="Direction", description="Just an example", items=my_items, default='UP')
-
-    # Optional function for drawing the socket input value
-    def draw(self, context, layout, node, text):
-        if self.is_output or self.is_linked:
-            layout.label(text)
-        else:
-            layout.prop(self, "myEnumProperty", text=text)
-
-    # Socket color
-    def draw_color(self, context, node):
-        return (1.0, 0.4, 0.216, 0.5)
-
-
 # Mix-in class for all custom nodes in this tree type.
 # Defines a poll function to enable instantiation.
 class MyCustomTreeNode:
