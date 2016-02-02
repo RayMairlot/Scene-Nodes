@@ -83,6 +83,30 @@ class GraphScene(bpy.types.Operator):
                     newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 80
                     
                     nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
+                    
+                
+                for materialSlot in object.material_slots:
+                    
+                    objectMaterial = materialSlot.material
+                    
+                    newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
+                    
+                    for materialIndex, material in enumerate(bpy.data.materials):
+                        
+                        if objectMaterial.name == material.name:
+                            
+                            newMaterialNode.materialIndex = materialIndex
+                            
+                            break
+                    
+                    newMaterialNode.select = False
+                    newMaterialNode.location[1] = newObjectNode.location[1]
+                    newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 80
+                    newMaterialNode.name = bpy.data.materials[materialIndex].name
+                    newMaterialNode.use_custom_color = True                   
+                    newMaterialNode.color = [1.000000, 0.608448, 0.993887]
+                    
+                    nodeGroup.links.new(newMaterialNode.inputs[0], newObjectNode.outputs[1])
                                                                                    
                     
             
@@ -246,6 +270,28 @@ class ObjectNode(Node, MyCustomTreeNode):
     def copy(self, node):
         print("Copying from node ", node)
         
+        object = bpy.data.objects[self.objectIndex]
+        
+        scene = bpy.data.objects[self.objectIndex].users_scene[0]
+                
+        if object.type == "CAMERA":
+            
+            newCamera = bpy.data.cameras.new(object.name)
+            
+            newObject = bpy.data.objects.new(object.name, newCamera)
+            
+            scene.objects.link(newObject)
+            scene.update()
+            
+            #bpy.ops.scene_nodes.graph_scene()
+            
+            ################################################
+            #Need to re-index after duplicating.
+            #Compare list of objects before duplicating and after to see difference.
+            
+            
+            
+        
     # Free function to clean up on removal.
     def free(self):
         print("Removing node ", self, ", Goodbye!")
@@ -266,6 +312,54 @@ class ObjectNode(Node, MyCustomTreeNode):
     # Explicit user label overrides this, but here we can define a label dynamically
     def draw_label(self):
         return "Object Node"
+
+
+
+class MaterialNode(Node, MyCustomTreeNode):
+    '''A custom node'''
+    bl_idname = 'MaterialNodeType'
+    bl_label = 'Material'
+    bl_icon = 'MATERIAL_DATA'
+
+    materialIndex = bpy.props.IntProperty()
+
+
+    def init(self, context):
+                
+        self.inputs.new('NodeSocketFloat', "Object")
+        
+        
+    def update(self):
+        
+        print("updating node: ", self.name, len(self.inputs[0].links))
+                
+    # Copy function to initialize a copied node from an existing one.
+    def copy(self, node):
+        
+        print("Copying from node ", node)
+ 
+    # Free function to clean up on removal.
+    def free(self):
+        
+        print("Removing node ", self, ", Goodbye!")
+
+    # Additional buttons displayed on the node.
+    def draw_buttons(self, context, layout):
+
+        layout.prop(bpy.data.materials[self.materialIndex], "name", text="", icon="MATERIAL_DATA")
+
+    # Detail buttons in the sidebar.
+    # If this function is not defined, the draw_buttons function is used instead
+#    def draw_buttons_ext(self, context, layout):
+#        layout.prop(self, "myFloatProperty")
+#        # myStringProperty button will only be visible in the sidebar
+#        layout.prop(self, "myStringProperty")
+
+    # Optional: custom label
+    # Explicit user label overrides this, but here we can define a label dynamically
+    def draw_label(self):
+        return "Material Node"
+
 
 
 
@@ -315,7 +409,8 @@ def register():
     bpy.utils.register_class(SceneTree)
     bpy.utils.register_class(MyCustomSocket)
     bpy.utils.register_class(SceneNode)
-    bpy.utils.register_class(ObjectNode)    
+    bpy.utils.register_class(ObjectNode)
+    bpy.utils.register_class(MaterialNode)        
     bpy.utils.register_class(GraphScene)
 
     bpy.types.NODE_HT_header.append(SceneNodesHeader)
@@ -330,6 +425,7 @@ def unregister():
     bpy.utils.unregister_class(MyCustomTree)
     bpy.utils.unregister_class(MyCustomSocket)
     bpy.utils.unregister_class(SceneNode)
+    bpy.utils.unregister_class(MaterialNode)            
     bpy.utils.register_class(ObjectNode)
     bpy.utils.unregister_class(GraphScene)
 
