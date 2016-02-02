@@ -410,28 +410,21 @@ def SceneNodesHeader(self, context):
 
 
 def register():
-    bpy.utils.register_class(SceneTree)
-    bpy.utils.register_class(MyCustomSocket)
-    bpy.utils.register_class(SceneNode)
-    bpy.utils.register_class(ObjectNode)
-    bpy.utils.register_class(MaterialNode)        
-    bpy.utils.register_class(GraphScene)
+
+    bpy.utils.register_module(__name__)    
 
     bpy.types.NODE_HT_header.append(SceneNodesHeader)
 
-    nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)
+    nodeitems_utils.register_node_categories("SCENE_NODES", node_categories)
     
 
 
 def unregister():
-    nodeitems_utils.unregister_node_categories("CUSTOM_NODES")
+    
+    bpy.utils.unregister_module(__name__) 
+    
+    nodeitems_utils.unregister_node_categories("SCENE_NODES")
 
-    bpy.utils.unregister_class(MyCustomTree)
-    bpy.utils.unregister_class(MyCustomSocket)
-    bpy.utils.unregister_class(SceneNode)
-    bpy.utils.unregister_class(MaterialNode)            
-    bpy.utils.register_class(ObjectNode)
-    bpy.utils.unregister_class(GraphScene)
 
 #if __name__ == "__main__":
 #    register()
