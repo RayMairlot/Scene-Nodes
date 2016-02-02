@@ -49,10 +49,11 @@ class GraphScene(bpy.types.Operator):
                     
                     newObjectNode.color = [1.000000, 0.792470, 0.552983]
                     
+                    newObjectNode.outputs.new('NodeSocketFloat', "Material")
+                    
                 elif objectType == "LAMP":
                     
                     newObjectNode.color = [1.000000, 0.936002, 0.395156]
-                
                                 
                 if bpy.data.objects[objectIndex].parent == None:
                     
@@ -238,7 +239,6 @@ class ObjectNode(Node, MyCustomTreeNode):
                 
         self.inputs.new('NodeSocketFloat', "Parent")
         self.outputs.new('NodeSocketFloat', "Child")
-        self.outputs.new('NodeSocketFloat', "Material")
         
 
     def update(self):
