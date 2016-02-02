@@ -33,18 +33,19 @@ class GraphScene(bpy.types.Operator):
             totalHeight = len([object for object in scene.objects if object.parent == None]) * -110
             
             yOffset = 0
-                          
+                                      
             for objectIndex, object in enumerate(scene.objects):
                 
                 newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
                 newObjectNode.objectIndex = objectIndex
                 newObjectNode.select = False
-                newObjectNode.name = bpy.data.objects[objectIndex].name
-
-                objectType = bpy.data.objects[objectIndex].type
-
+                newObjectNode.name = scene.objects[objectIndex].name
                 newObjectNode.use_custom_color = True
-                
+               
+                print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
+                                
+                objectType = scene.objects[objectIndex].type
+                                
                 if objectType == "MESH":
                     
                     newObjectNode.color = [1.000000, 0.792470, 0.552983]
@@ -55,7 +56,7 @@ class GraphScene(bpy.types.Operator):
                     
                     newObjectNode.color = [1.000000, 0.936002, 0.395156]
                                 
-                if bpy.data.objects[objectIndex].parent == None:
+                if scene.objects[objectIndex].parent == None:
                     
                     newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
                     newObjectNode.location[0] = newSceneNode.width + 80
@@ -66,7 +67,7 @@ class GraphScene(bpy.types.Operator):
                     
                 else:
                     
-                    parentName = bpy.data.objects[objectIndex].parent.name
+                    parentName = scene.objects[objectIndex].parent.name
                     
                     if len(nodeGroup.nodes[parentName].outputs['Child'].links) == 0:
                         
@@ -80,37 +81,47 @@ class GraphScene(bpy.types.Operator):
                         
                         newObjectNode.location[1] = lastChild.location[1] - 140
                         
-                    
                     newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 80
                     
                     nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
-                    
+                 
                 
                 for materialSlot in object.material_slots:
                     
+                    print("Looking on object "+object.name+", node "+newObjectNode.name)
+                    
                     objectMaterial = materialSlot.material
                     
-                    newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
-                    
-                    for materialIndex, material in enumerate(bpy.data.materials):
+                    materialIndex = 0
+                                        
+                    for material in bpy.data.materials:
                         
                         if objectMaterial.name == material.name:
+                                                        
+                            #If material node doesn't already exist
+                            if material.name not in nodeGroup.nodes:
+                                                                                        
+                                newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
+                                newMaterialNode.materialIndex = materialIndex
+                                newMaterialNode.select = False
+                                newMaterialNode.location[1] = newObjectNode.location[1]
+                                newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 80
+                                newMaterialNode.name = bpy.data.materials[materialIndex].name                                
+                                newMaterialNode.use_custom_color = True                   
+                                newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
                             
-                            newMaterialNode.materialIndex = materialIndex
+                                input = newMaterialNode.inputs[0]
+                                                    
+                            else:
+                                
+                                input = nodeGroup.nodes[bpy.data.materials[materialIndex].name].inputs.new('NodeSocketFloat', "Object")
+
+                        materialIndex+=1                    
+                    
+                        print(newObjectNode.name)
+                        nodeGroup.links.new(input, newObjectNode.outputs[1])
+                                               
                             
-                            break
-                    
-                    newMaterialNode.select = False
-                    newMaterialNode.location[1] = newObjectNode.location[1]
-                    newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 80
-                    newMaterialNode.name = bpy.data.materials[materialIndex].name
-                    newMaterialNode.use_custom_color = True                   
-                    newMaterialNode.color = [1.000000, 0.608448, 0.993887]
-                    
-                    nodeGroup.links.new(newMaterialNode.inputs[0], newObjectNode.outputs[1])
-                                                                                   
-                    
-            
         context.scene.graphing = False
             
         return {'FINISHED'}
@@ -245,11 +256,13 @@ class ObjectNode(Node, MyCustomTreeNode):
         
         #print("updating node: ", self.name, len(self.inputs[0].links))
         
+        scene = bpy.data.scenes["Scene"]
+        
         if len(self.inputs[0].links) != 1:
+                        
+            scene.objects[self.objectIndex].parent = None
             
-            bpy.data.objects[self.objectIndex].parent = None
-            
-            sceneName = bpy.data.objects[self.objectIndex].users_scene[0].name
+            sceneName = scene.objects[self.objectIndex].users_scene[0].name
             
             nodeGroup = bpy.data.node_groups['NodeTree']
             
@@ -263,7 +276,7 @@ class ObjectNode(Node, MyCustomTreeNode):
             
             if parentName != "Scene":
             
-                bpy.data.objects[self.objectIndex].parent = bpy.data.objects[parentName]
+                scene.objects[self.objectIndex].parent = scene.objects[parentName]
         
 
     # Copy function to initialize a copied node from an existing one.
@@ -298,8 +311,10 @@ class ObjectNode(Node, MyCustomTreeNode):
 
     # Additional buttons displayed on the node.
     def draw_buttons(self, context, layout):
-
-        layout.prop(bpy.data.objects[self.objectIndex], "name", text="", icon=bpy.data.objects[self.objectIndex].type+"_DATA")
+        
+        scene = bpy.data.scenes["Scene"]
+        
+        layout.prop(scene.objects[self.objectIndex], "name", text="", icon=scene.objects[self.objectIndex].type+"_DATA")
 
     # Detail buttons in the sidebar.
     # If this function is not defined, the draw_buttons function is used instead
@@ -329,9 +344,9 @@ class MaterialNode(Node, MyCustomTreeNode):
         self.inputs.new('NodeSocketFloat', "Object")
         
         
-    def update(self):
-        
-        print("updating node: ", self.name, len(self.inputs[0].links))
+#    def update(self):
+#        
+#        print("updating node: ", self.name, len(self.inputs[0].links))
                 
     # Copy function to initialize a copied node from an existing one.
     def copy(self, node):
