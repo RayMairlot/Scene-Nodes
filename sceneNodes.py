@@ -40,6 +40,18 @@ class GraphScene(bpy.types.Operator):
                 newObjectNode.objectIndex = objectIndex
                 newObjectNode.select = False
                 newObjectNode.name = bpy.data.objects[objectIndex].name
+
+                objectType = bpy.data.objects[objectIndex].type
+
+                newObjectNode.use_custom_color = True
+                
+                if objectType == "MESH":
+                    
+                    newObjectNode.color = [1.000000, 0.792470, 0.552983]
+                    
+                elif objectType == "LAMP":
+                    
+                    newObjectNode.color = [1.000000, 0.936002, 0.395156]
                 
                                 
                 if bpy.data.objects[objectIndex].parent == None:
@@ -199,6 +211,7 @@ class ObjectNode(Node, MyCustomTreeNode):
 
 
     def init(self, context):
+                
         self.inputs.new('NodeSocketFloat', "Parent")
         self.outputs.new('NodeSocketFloat', "Child")
         self.outputs.new('NodeSocketFloat', "Material")
@@ -206,7 +219,7 @@ class ObjectNode(Node, MyCustomTreeNode):
 
     def update(self):
         
-        print("updating node: ", self.name, len(self.inputs[0].links))
+        #print("updating node: ", self.name, len(self.inputs[0].links))
         
         if len(self.inputs[0].links) != 1:
             
@@ -216,7 +229,7 @@ class ObjectNode(Node, MyCustomTreeNode):
             
             parentName = self.inputs[0].links[0].from_node.name
                                     
-            print(parentName)
+            #print(parentName)
             
             if parentName != "Scene":
             
