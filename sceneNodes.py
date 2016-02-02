@@ -14,7 +14,7 @@ class GraphScene(bpy.types.Operator):
 
     def execute(self, context):
         
-        #Stops scenes from being deleted when nodes are cleared
+        #Stops nodes from being deleted when nodes are cleared
         context.scene.graphing = True
         
         nodeGroup = bpy.data.node_groups['NodeTree']
@@ -43,7 +43,7 @@ class GraphScene(bpy.types.Operator):
                 newObjectNode.name = scene.objects[objectIndex].name
                 newObjectNode.use_custom_color = True
                
-                print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
+                #print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
                                 
                 objectType = scene.objects[objectIndex].type
                                 
@@ -89,7 +89,7 @@ class GraphScene(bpy.types.Operator):
                 
                 for materialSlot in object.material_slots:
                     
-                    print("Looking on object "+object.name+", node "+newObjectNode.name)
+                    #print("Looking on object "+object.name+", node "+newObjectNode.name)
                     
                     objectMaterial = materialSlot.material
                     
@@ -295,25 +295,23 @@ class ObjectNode(Node, MyCustomTreeNode):
             scene.objects.link(newObject)
             scene.update()
             
-            #bpy.ops.scene_nodes.graph_scene()
-            
-            ################################################
-            #Need to re-index after duplicating.
-            #Compare list of objects before duplicating and after to see difference.
-            
             reIndex(scene)            
             
     # Free function to clean up on removal.
     def free(self):
         
-        scene = bpy.data.scenes[self.scene]
+        scene = bpy.data.scene[self.scene]
         
-        scene.objects[self.objectIndex].select = True
-        bpy.ops.object.delete()
-        
-        reIndex(scene)
-        
-        print("Removing node ", self, ", Goodbye!")
+        if not scene.graphing:
+             
+            scene = bpy.data.scenes[self.scene]
+            
+            scene.objects[self.objectIndex].select = True
+            bpy.ops.object.delete()
+            
+            reIndex(scene)
+            
+            print("Removing node ", self, ", Goodbye!")
 
     # Additional buttons displayed on the node.
     def draw_buttons(self, context, layout):
