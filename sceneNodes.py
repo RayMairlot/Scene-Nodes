@@ -282,15 +282,15 @@ class ObjectNode(Node, MyCustomTreeNode):
     def copy(self, node):
         print("Copying from node ", node)
         
-        object = bpy.data.objects[self.objectIndex]
-        
         scene = bpy.data.scenes[self.scene]
-                
+        
+        object = scene.objects[self.objectIndex]
+                        
         if object.type == "CAMERA":
             
-            newCamera = scene.cameras.new(object.name)
+            newCamera = bpy.data.cameras.new(object.name)
             
-            newObject = scene.objects.new(object.name, newCamera)
+            newObject = bpy.data.objects.new(object.name, newCamera)
             
             scene.objects.link(newObject)
             scene.update()
@@ -301,11 +301,18 @@ class ObjectNode(Node, MyCustomTreeNode):
             #Need to re-index after duplicating.
             #Compare list of objects before duplicating and after to see difference.
             
+            reIndex(scene)            
             
-            
-        
     # Free function to clean up on removal.
     def free(self):
+        
+        scene = bpy.data.scenes[self.scene]
+        
+        scene.objects[self.objectIndex].select = True
+        bpy.ops.object.delete()
+        
+        reIndex(scene)
+        
         print("Removing node ", self, ", Goodbye!")
 
     # Additional buttons displayed on the node.
@@ -326,6 +333,14 @@ class ObjectNode(Node, MyCustomTreeNode):
     # Explicit user label overrides this, but here we can define a label dynamically
     def draw_label(self):
         return "Object Node"
+
+
+
+def reIndex(scene):
+    
+    for objectIndex, object in enumerate(scene.objects):
+                
+        bpy.data.node_groups['NodeTree'].nodes[object.name].objectIndex = objectIndex
 
 
 
