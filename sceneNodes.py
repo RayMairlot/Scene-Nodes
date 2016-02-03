@@ -208,7 +208,7 @@ class SceneNode(Node, MyCustomTreeNode):
     # Optional: custom label
     # Explicit user label overrides this, but here we can define a label dynamically
     def draw_label(self):
-        return "Scene Node"
+        return self.sceneIndex
 
 
 
@@ -313,7 +313,7 @@ class ObjectNode(Node, MyCustomTreeNode):
     # Optional: custom label
     # Explicit user label overrides this, but here we can define a label dynamically
     def draw_label(self):
-        return "Object Node"
+        return self.objectIndex
 
 
 
@@ -368,7 +368,7 @@ class MaterialNode(Node, MyCustomTreeNode):
     # Optional: custom label
     # Explicit user label overrides this, but here we can define a label dynamically
     def draw_label(self):
-        return "Material Node"
+        return self.materialIndex
 
 
 
