@@ -26,7 +26,7 @@ class GraphScene(bpy.types.Operator):
         for sceneIndex, scene in enumerate(bpy.data.scenes):
             
             newSceneNode = nodeGroup.nodes.new('SceneNodeType')
-            newSceneNode.sceneIndex = sceneIndex
+            newSceneNode.sceneIndex = scene.name
             newSceneNode.select = False
             newSceneNode.location[1] = sceneIndex * -newSceneNode.height
             
@@ -38,7 +38,7 @@ class GraphScene(bpy.types.Operator):
             for objectIndex, object in enumerate(scene.objects):
                 
                 newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
-                newObjectNode.objectIndex = objectIndex
+                newObjectNode.objectIndex = object.name
                 newObjectNode.scene = scene.name
                 newObjectNode.select = False
                 newObjectNode.name = scene.objects[objectIndex].name
@@ -104,7 +104,7 @@ class GraphScene(bpy.types.Operator):
                             if material.name not in nodeGroup.nodes:
                                                                                         
                                 newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
-                                newMaterialNode.materialIndex = materialIndex
+                                newMaterialNode.materialIndex = material.name
                                 newMaterialNode.select = False
                                 newMaterialNode.location[1] = newObjectNode.location[1]
                                 newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
@@ -153,7 +153,7 @@ class SceneNode(Node, MyCustomTreeNode):
     bl_label = 'Scene'
     bl_icon = 'SCENE_DATA'
 
-    sceneIndex = bpy.props.IntProperty()
+    sceneIndex = bpy.props.StringProperty()
     
     #newScene = bpy.props.BoolProperty(default=False)
 #    otherIndex = len(bpy.data.scenes)
@@ -218,7 +218,7 @@ class ObjectNode(Node, MyCustomTreeNode):
     bl_label = 'Object'
     bl_icon = 'OBJECT_DATA'
 
-    objectIndex = bpy.props.IntProperty()
+    objectIndex = bpy.props.StringProperty()
     scene = bpy.props.StringProperty(default=bpy.data.scenes[0].name)
     
     def init(self, context):
@@ -274,7 +274,11 @@ class ObjectNode(Node, MyCustomTreeNode):
             oldParentNode = nodeGroup.nodes[object.name].inputs[0].links[0].from_node   
             nodeGroup.links.new(self.inputs[0], oldParentNode.outputs[0])
             
-            reIndex(scene)            
+            #Set properties for new node
+            self.name = newObject.name
+            self.objectIndex = newObject.name
+            
+            #reIndex(scene)            
             
     # Free function to clean up on removal.
     def free(self):
@@ -317,7 +321,7 @@ def reIndex(scene):
     
     for objectIndex, object in enumerate(scene.objects):
                 
-        bpy.data.node_groups['NodeTree'].nodes[object.name].objectIndex = objectIndex
+        bpy.data.node_groups['NodeTree'].nodes[object.name].objectIndex = object.name
 
 
 
@@ -327,7 +331,7 @@ class MaterialNode(Node, MyCustomTreeNode):
     bl_label = 'Material'
     bl_icon = 'MATERIAL_DATA'
 
-    materialIndex = bpy.props.IntProperty()
+    materialIndex = bpy.props.StringProperty()
 
 
     def init(self, context):
@@ -417,7 +421,7 @@ def register():
     #Only appends the header once during development
     if not bpy.context.scene.appended_header:
         bpy.types.NODE_HT_header.append(SceneNodesHeader)
-        bpy.context.scene.appended_header = True
+        bpy.context.scene.appended_header = True    
 
     if 'SCENE_NODES' in nodeitems_utils._node_categories:
         nodeitems_utils.unregister_node_categories("SCENE_NODES")
@@ -438,3 +442,4 @@ def unregister():
 #    
 
 register()    
+#bpy.types.NODE_HT_header.append(SceneNodesHeader)    
