@@ -415,9 +415,10 @@ def register():
 
     bpy.types.NODE_HT_header.append(SceneNodesHeader)
 
+    if 'SCENE_NODES' in nodeitems_utils._node_categories:
+        nodeitems_utils.unregister_node_categories("SCENE_NODES")
     nodeitems_utils.register_node_categories("SCENE_NODES", node_categories)
     
-
 
 def unregister():
     
