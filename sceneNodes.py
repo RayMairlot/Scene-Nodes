@@ -116,7 +116,7 @@ class GraphScene(bpy.types.Operator):
                                                     
                             else:
                                 
-                                input = nodeGroup.nodes[bpy.data.materials[materialIndex].name].inputs.new('NodeSocketFloat', "Object")
+                                input = nodeGroup.nodes[bpy.data.materials[materialIndex].name].inputs[0]
 
                         materialIndex+=1                    
                     
@@ -337,6 +337,7 @@ class MaterialNode(Node, MyCustomTreeNode):
     def init(self, context):
                 
         self.inputs.new('NodeSocketFloat', "Object")
+        self.inputs[0].link_limit = 9999
         
         
 #    def update(self):
