@@ -4,6 +4,7 @@ import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
 bpy.types.Scene.graphing = bpy.props.BoolProperty(default=False)
+bpy.types.Scene.appended_header = bpy.props.BoolProperty(default=False)
 
 class GraphScene(bpy.types.Operator):
     """Add a simple box mesh"""
@@ -412,8 +413,11 @@ def SceneNodesHeader(self, context):
 def register():
 
     bpy.utils.register_module(__name__)    
-
-    bpy.types.NODE_HT_header.append(SceneNodesHeader)
+    
+    #Only appends the header once during development
+    if not bpy.context.scene.appended_header:
+        bpy.types.NODE_HT_header.append(SceneNodesHeader)
+        bpy.context.scene.appended_header = True
 
     if 'SCENE_NODES' in nodeitems_utils._node_categories:
         nodeitems_utils.unregister_node_categories("SCENE_NODES")
@@ -423,10 +427,12 @@ def register():
 def unregister():
     
     bpy.utils.unregister_module(__name__) 
+
+    bpy.types.NODE_HT_header.remove(SceneNodesHeader)
+    bpy.context.scene.appended_header = False
     
     nodeitems_utils.unregister_node_categories("SCENE_NODES")
-
-
+    
 #if __name__ == "__main__":
 #    register()
 #    
