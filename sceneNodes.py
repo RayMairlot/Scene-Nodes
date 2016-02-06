@@ -274,8 +274,7 @@ class ObjectNode(Node, MyCustomTreeNode):
             #Set properties for new node
             self.name = newObject.name
             self.objectIndex = newObject.name
-            
-            #reIndex(scene)            
+                      
             
     # Free function to clean up on removal.
     def free(self):
@@ -288,8 +287,6 @@ class ObjectNode(Node, MyCustomTreeNode):
             
             scene.objects[self.objectIndex].select = True
             bpy.ops.object.delete()
-            
-            reIndex(scene)
             
             print("Removing node ", self, ", Goodbye!")
 
@@ -311,14 +308,6 @@ class ObjectNode(Node, MyCustomTreeNode):
     # Explicit user label overrides this, but here we can define a label dynamically
     def draw_label(self):
         return self.objectIndex
-
-
-
-def reIndex(scene):
-    
-    for objectIndex, object in enumerate(scene.objects):
-                
-        bpy.data.node_groups['NodeTree'].nodes[object.name].objectIndex = object.name
 
 
 
