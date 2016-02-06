@@ -40,10 +40,12 @@ class GraphScene(bpy.types.Operator):
             totalHeight = len([object for object in scene.objects if object.parent == None]) * -110
             
             yOffset = 0
-                                      
+                                                  
             for object in scene.objects:
                 
-                if getattr(scene, "graph_"+object.type.lower()+"_objects"):
+                objectNotFiltered = getattr(scene, "graph_"+object.type.lower()+"_objects")
+                
+                if objectNotFiltered:
                 
                     newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
                     newObjectNode.objectIndex = object.name
@@ -444,4 +446,4 @@ def unregister():
 #    
 
 register()    
-bpy.types.NODE_HT_header.append(SceneNodesHeader)    
+#bpy.types.NODE_HT_header.append(SceneNodesHeader)    
