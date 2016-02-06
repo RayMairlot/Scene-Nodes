@@ -314,7 +314,14 @@ class ObjectNode(Node, MyCustomTreeNode):
         
         scene = bpy.data.scenes[self.scene]
         
-        layout.prop(scene.objects[self.objectIndex], "name", text="", icon=scene.objects[self.objectIndex].type+"_DATA")
+        if scene.objects[self.objectIndex].type == "SPEAKER":
+        
+            layout.prop(scene.objects[self.objectIndex], "name", text="", icon=scene.objects[self.objectIndex].type)
+            
+        else:
+            
+            layout.prop(scene.objects[self.objectIndex], "name", text="", icon=scene.objects[self.objectIndex].type+"_DATA")
+
 
     # Detail buttons in the sidebar.
     # If this function is not defined, the draw_buttons function is used instead
