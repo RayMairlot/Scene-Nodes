@@ -6,6 +6,11 @@ from nodeitems_utils import NodeCategory, NodeItem
 bpy.types.Scene.graphing = bpy.props.BoolProperty(default=False)
 bpy.types.Scene.appended_header = bpy.props.BoolProperty(default=False)
 
+bpy.types.Scene.graph_mesh_objects = bpy.props.BoolProperty(default=True)
+bpy.types.Scene.graph_camera_objects = bpy.props.BoolProperty(default=True)
+bpy.types.Scene.graph_lamp_objects = bpy.props.BoolProperty(default=True)
+bpy.types.Scene.graph_materials = bpy.props.BoolProperty(default=True)
+
 class GraphScene(bpy.types.Operator):
     """Add a simple box mesh"""
     bl_idname = "scene_nodes.graph_scene"
@@ -38,87 +43,91 @@ class GraphScene(bpy.types.Operator):
                                       
             for object in scene.objects:
                 
-                newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
-                newObjectNode.objectIndex = object.name
-                newObjectNode.scene = scene.name
-                newObjectNode.select = False
-                newObjectNode.name = object.name
-                newObjectNode.use_custom_color = True
-               
-                #print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
-                                                                
-                if object.type == "MESH":
-                    
-                    newObjectNode.color = [1.000000, 0.792470, 0.552983]
-                    
-                    newObjectNode.outputs.new('NodeSocketFloat', "Material")
-                    
-                elif object.type == "LAMP":
-                    
-                    newObjectNode.color = [1.000000, 0.936002, 0.395156]
-                                
-                if object.parent == None:
-                    
-                    newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
-                    newObjectNode.location[0] = newSceneNode.width + 80
-                    
-                    nodeGroup.links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
-                    
-                    yOffset = yOffset + 1
-                    
-                else:
-                    
-                    parentName = object.parent.name
-                    
-                    parentNode = nodeGroup.nodes[parentName]
-                    
-                    if len(parentNode.outputs['Child'].links) == 0:
+                if getattr(scene, "graph_"+object.type.lower()+"_objects"):
+                
+                    newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
+                    newObjectNode.objectIndex = object.name
+                    newObjectNode.scene = scene.name
+                    newObjectNode.select = False
+                    newObjectNode.name = object.name
+                    newObjectNode.use_custom_color = True
+                   
+                    #print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
+                                                                    
+                    if object.type == "MESH":
                         
-                        newObjectNode.location[1] = parentNode.location[1]
+                        newObjectNode.color = [1.000000, 0.792470, 0.552983]
+                        
+                        newObjectNode.outputs.new('NodeSocketFloat', "Material")
+                        
+                    elif object.type == "LAMP":
+                        
+                        newObjectNode.color = [1.000000, 0.936002, 0.395156]
+                                    
+                    if object.parent == None:
+                        
+                        newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
+                        newObjectNode.location[0] = newSceneNode.width + 80
+                        
+                        nodeGroup.links.new(newObjectNode.inputs[0], newSceneNode.outputs[0])  
+                        
+                        yOffset = yOffset + 1
                         
                     else:
                         
-                        totalChildren = len(parentNode.outputs['Child'].links)
+                        parentName = object.parent.name
                         
-                        lastChild = parentNode.outputs['Child'].links[totalChildren-1].to_node
+                        parentNode = nodeGroup.nodes[parentName]
                         
-                        newObjectNode.location[1] = lastChild.location[1] - 140
-                        
-                    newObjectNode.location[0] = parentNode.location[0] + newObjectNode.width + 120
-                    
-                    nodeGroup.links.new(newObjectNode.inputs[0], parentNode.outputs[0])
-                 
-                
-                for materialSlot in object.material_slots:
-                    
-                    #print("Looking on object "+object.name+", node "+newObjectNode.name)
-                    
-                    objectMaterial = materialSlot.material
-                                                            
-                    for material in bpy.data.materials:
-                        
-                        if objectMaterial.name == material.name:
-                                                        
-                            #If material node doesn't already exist
-                            if material.name not in nodeGroup.nodes:
-                                                                                        
-                                newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
-                                newMaterialNode.materialIndex = material.name
-                                newMaterialNode.select = False
-                                newMaterialNode.location[1] = newObjectNode.location[1]
-                                newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
-                                newMaterialNode.name = material.name                                
-                                newMaterialNode.use_custom_color = True                   
-                                newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
+                        if len(parentNode.outputs['Child'].links) == 0:
                             
-                                input = newMaterialNode.inputs[0]
-                                                    
-                            else:
-                                
-                                input = nodeGroup.nodes[material.name].inputs[0]                  
+                            newObjectNode.location[1] = parentNode.location[1]
+                            
+                        else:
+                            
+                            totalChildren = len(parentNode.outputs['Child'].links)
+                            
+                            lastChild = parentNode.outputs['Child'].links[totalChildren-1].to_node
+                            
+                            newObjectNode.location[1] = lastChild.location[1] - 140
+                            
+                        newObjectNode.location[0] = parentNode.location[0] + newObjectNode.width + 120
+                        
+                        nodeGroup.links.new(newObjectNode.inputs[0], parentNode.outputs[0])
+                     
+                     
+                    if scene.graph_materials:
                     
-                        print(newObjectNode.name)
-                        nodeGroup.links.new(input, newObjectNode.outputs[1])
+                        for materialSlot in object.material_slots:
+                            
+                            #print("Looking on object "+object.name+", node "+newObjectNode.name)
+                            
+                            objectMaterial = materialSlot.material
+                                                                    
+                            for material in bpy.data.materials:
+                                
+                                if objectMaterial.name == material.name:
+                                                                
+                                    #If material node doesn't already exist
+                                    if material.name not in nodeGroup.nodes:
+                                                                                                
+                                        newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
+                                        newMaterialNode.materialIndex = material.name
+                                        newMaterialNode.select = False
+                                        newMaterialNode.location[1] = newObjectNode.location[1]
+                                        newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
+                                        newMaterialNode.name = material.name                                
+                                        newMaterialNode.use_custom_color = True                   
+                                        newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
+                                    
+                                        input = newMaterialNode.inputs[0]
+                                                            
+                                    else:
+                                        
+                                        input = nodeGroup.nodes[material.name].inputs[0]                  
+                            
+                                print(newObjectNode.name)
+                                nodeGroup.links.new(input, newObjectNode.outputs[1])
                                                
                             
         context.scene.graphing = False
@@ -398,6 +407,12 @@ def SceneNodesHeader(self, context):
     
     row = layout.row()
     row.operator("scene_nodes.graph_scene", text="Graph Scene")
+    
+    row = layout.row(align=True)
+    row.prop(context.scene, "graph_mesh_objects", text="", toggle=True, icon="MESH_DATA")
+    row.prop(context.scene, "graph_camera_objects", text="", toggle=True, icon="CAMERA_DATA")
+    row.prop(context.scene, "graph_lamp_objects", text="", toggle=True, icon="LAMP_DATA")
+    row.prop(context.scene, "graph_materials", text="", toggle=True, icon="MATERIAL_DATA")
 
 
 
@@ -429,4 +444,4 @@ def unregister():
 #    
 
 register()    
-#bpy.types.NODE_HT_header.append(SceneNodesHeader)    
+bpy.types.NODE_HT_header.append(SceneNodesHeader)    
