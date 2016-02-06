@@ -55,7 +55,7 @@ class GraphScene(bpy.types.Operator):
                 
                 objectNotFiltered = getattr(scene, "graph_"+object.type.lower()+"_objects")
                 
-                if objectNotFiltered:
+                if objectNotFiltered or not scene.graph_filtering:
                 
                     newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
                     newObjectNode.objectIndex = object.name
@@ -108,7 +108,7 @@ class GraphScene(bpy.types.Operator):
                         nodeGroup.links.new(newObjectNode.inputs[0], parentNode.outputs[0])
                      
                      
-                    if scene.graph_materials:
+                    if scene.graph_materials or not scene.graph_filtering:
                     
                         for materialSlot in object.material_slots:
                             
@@ -475,4 +475,4 @@ def unregister():
 #    
 
 register()    
-bpy.types.NODE_HT_header.append(SceneNodesHeader)    
+#bpy.types.NODE_HT_header.append(SceneNodesHeader)    
