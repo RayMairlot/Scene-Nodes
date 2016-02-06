@@ -28,6 +28,7 @@ class GraphScene(bpy.types.Operator):
             newSceneNode = nodeGroup.nodes.new('SceneNodeType')
             newSceneNode.sceneIndex = scene.name
             newSceneNode.select = False
+            newSceneNode.name = scene.name
             newSceneNode.location[1] = sceneIndex * -newSceneNode.height
             
             #Only get objects that aren't children themselves
@@ -35,30 +36,28 @@ class GraphScene(bpy.types.Operator):
             
             yOffset = 0
                                       
-            for objectIndex, object in enumerate(scene.objects):
+            for object in scene.objects:
                 
                 newObjectNode = nodeGroup.nodes.new('ObjectNodeType')
                 newObjectNode.objectIndex = object.name
                 newObjectNode.scene = scene.name
                 newObjectNode.select = False
-                newObjectNode.name = scene.objects[objectIndex].name
+                newObjectNode.name = object.name
                 newObjectNode.use_custom_color = True
                
                 #print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
-                                
-                objectType = scene.objects[objectIndex].type
-                                
-                if objectType == "MESH":
+                                                                
+                if object.type == "MESH":
                     
                     newObjectNode.color = [1.000000, 0.792470, 0.552983]
                     
                     newObjectNode.outputs.new('NodeSocketFloat', "Material")
                     
-                elif objectType == "LAMP":
+                elif object.type == "LAMP":
                     
                     newObjectNode.color = [1.000000, 0.936002, 0.395156]
                                 
-                if scene.objects[objectIndex].parent == None:
+                if object.parent == None:
                     
                     newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
                     newObjectNode.location[0] = newSceneNode.width + 80
@@ -69,23 +68,25 @@ class GraphScene(bpy.types.Operator):
                     
                 else:
                     
-                    parentName = scene.objects[objectIndex].parent.name
+                    parentName = object.parent.name
                     
-                    if len(nodeGroup.nodes[parentName].outputs['Child'].links) == 0:
+                    parentNode = nodeGroup.nodes[parentName]
+                    
+                    if len(parentNode.outputs['Child'].links) == 0:
                         
-                        newObjectNode.location[1] = nodeGroup.nodes[parentName].location[1]
+                        newObjectNode.location[1] = parentNode.location[1]
                         
                     else:
                         
-                        totalChildren = len(nodeGroup.nodes[parentName].outputs['Child'].links)
+                        totalChildren = len(parentNode.outputs['Child'].links)
                         
-                        lastChild = nodeGroup.nodes[parentName].outputs['Child'].links[totalChildren-1].to_node
+                        lastChild = parentNode.outputs['Child'].links[totalChildren-1].to_node
                         
                         newObjectNode.location[1] = lastChild.location[1] - 140
                         
-                    newObjectNode.location[0] = nodeGroup.nodes[parentName].location[0] + newObjectNode.width + 120
+                    newObjectNode.location[0] = parentNode.location[0] + newObjectNode.width + 120
                     
-                    nodeGroup.links.new(newObjectNode.inputs[0], nodeGroup.nodes[parentName].outputs[0])
+                    nodeGroup.links.new(newObjectNode.inputs[0], parentNode.outputs[0])
                  
                 
                 for materialSlot in object.material_slots:
@@ -93,9 +94,7 @@ class GraphScene(bpy.types.Operator):
                     #print("Looking on object "+object.name+", node "+newObjectNode.name)
                     
                     objectMaterial = materialSlot.material
-                    
-                    materialIndex = 0
-                                        
+                                                            
                     for material in bpy.data.materials:
                         
                         if objectMaterial.name == material.name:
@@ -108,7 +107,7 @@ class GraphScene(bpy.types.Operator):
                                 newMaterialNode.select = False
                                 newMaterialNode.location[1] = newObjectNode.location[1]
                                 newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
-                                newMaterialNode.name = bpy.data.materials[materialIndex].name                                
+                                newMaterialNode.name = material.name                                
                                 newMaterialNode.use_custom_color = True                   
                                 newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
                             
@@ -116,9 +115,7 @@ class GraphScene(bpy.types.Operator):
                                                     
                             else:
                                 
-                                input = nodeGroup.nodes[bpy.data.materials[materialIndex].name].inputs[0]
-
-                        materialIndex+=1                    
+                                input = nodeGroup.nodes[material.name].inputs[0]                  
                     
                         print(newObjectNode.name)
                         nodeGroup.links.new(input, newObjectNode.outputs[1])
