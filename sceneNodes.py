@@ -6,6 +6,8 @@ from nodeitems_utils import NodeCategory, NodeItem
 bpy.types.Scene.graphing = bpy.props.BoolProperty(default=False)
 bpy.types.Scene.appended_header = bpy.props.BoolProperty(default=False)
 
+bpy.types.Scene.graph_filtering = bpy.props.BoolProperty(default=False)
+
 bpy.types.Scene.graph_mesh_objects = bpy.props.BoolProperty(default=True)
 bpy.types.Scene.graph_camera_objects = bpy.props.BoolProperty(default=True)
 bpy.types.Scene.graph_lamp_objects = bpy.props.BoolProperty(default=True)
@@ -425,19 +427,23 @@ def SceneNodesHeader(self, context):
     row = layout.row()
     row.operator("scene_nodes.graph_scene", text="Graph Scene")
     
-    row = layout.row(align=True)
-    row.prop(context.scene, "graph_mesh_objects", text="", toggle=True, icon="MESH_DATA")
-    row.prop(context.scene, "graph_camera_objects", text="", toggle=True, icon="CAMERA_DATA")
-    row.prop(context.scene, "graph_lamp_objects", text="", toggle=True, icon="LAMP_DATA")
-    row.prop(context.scene, "graph_armature_objects", text="", toggle=True, icon="ARMATURE_DATA")
-    row.prop(context.scene, "graph_curve_objects", text="", toggle=True, icon="CURVE_DATA")
-    row.prop(context.scene, "graph_lattice_objects", text="", toggle=True, icon="LATTICE_DATA")
-    row.prop(context.scene, "graph_meta_objects", text="", toggle=True, icon="META_DATA")
-    row.prop(context.scene, "graph_empty_objects", text="", toggle=True, icon="EMPTY_DATA")
-    row.prop(context.scene, "graph_surface_objects", text="", toggle=True, icon="SURFACE_DATA")
-    row.prop(context.scene, "graph_font_objects", text="", toggle=True, icon="FONT_DATA")
-    row.prop(context.scene, "graph_speaker_objects", text="", toggle=True, icon="SPEAKER")
-    row.prop(context.scene, "graph_materials", text="", toggle=True, icon="MATERIAL_DATA")
+    row = layout.row(align=True)    
+    row.prop(context.scene, "graph_filtering", text="", icon="FILTER")
+    
+    if context.scene.graph_filtering:
+    
+        row.prop(context.scene, "graph_mesh_objects", text="", toggle=True, icon="MESH_DATA")
+        row.prop(context.scene, "graph_camera_objects", text="", toggle=True, icon="CAMERA_DATA")
+        row.prop(context.scene, "graph_lamp_objects", text="", toggle=True, icon="LAMP_DATA")
+        row.prop(context.scene, "graph_armature_objects", text="", toggle=True, icon="ARMATURE_DATA")
+        row.prop(context.scene, "graph_curve_objects", text="", toggle=True, icon="CURVE_DATA")
+        row.prop(context.scene, "graph_lattice_objects", text="", toggle=True, icon="LATTICE_DATA")
+        row.prop(context.scene, "graph_meta_objects", text="", toggle=True, icon="META_DATA")
+        row.prop(context.scene, "graph_empty_objects", text="", toggle=True, icon="EMPTY_DATA")
+        row.prop(context.scene, "graph_surface_objects", text="", toggle=True, icon="SURFACE_DATA")
+        row.prop(context.scene, "graph_font_objects", text="", toggle=True, icon="FONT_DATA")
+        row.prop(context.scene, "graph_speaker_objects", text="", toggle=True, icon="SPEAKER")
+        row.prop(context.scene, "graph_materials", text="", toggle=True, icon="MATERIAL_DATA")
     
 
 
