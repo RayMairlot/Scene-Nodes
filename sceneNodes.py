@@ -111,15 +111,7 @@ class GraphScene(bpy.types.Operator):
                     elif object.type == "SPEAKER":
                                         
                         newObjectNode.color = [0.000000, 0.630769, 0.542676]
-#                        
-
-#                        bpy.types.Scene.graph_meta_objects = bpy.props.BoolProperty(default=True)
-#                        bpy.types.Scene.graph_empty_objects = bpy.props.BoolProperty(default=True)
-#                        bpy.types.Scene.graph_surface_objects = bpy.props.BoolProperty(default=True)
-#                        bpy.types.Scene.graph_font_objects = bpy.props.BoolProperty(default=True)
-#                        bpy.types.Scene.graph_speaker_objects = bpy.props.BoolProperty(default=True)
-                                                
-                        
+                                                                        
                                     
                     if object.parent == None:
                         
@@ -219,17 +211,6 @@ class SceneNode(Node, MyCustomTreeNode):
     bl_icon = 'SCENE_DATA'
 
     sceneIndex = bpy.props.StringProperty()
-    
-    #newScene = bpy.props.BoolProperty(default=False)
-#    otherIndex = len(bpy.data.scenes)
-
-#    print(sceneIndex)
-##        
-#    if newScene:
-#        
-#        bpy.data.scenes.new("Scene")
-#        
-#        sceneIndex = len(bpy.data.scenes)-1
 
 
     # === Optional Functions ===
