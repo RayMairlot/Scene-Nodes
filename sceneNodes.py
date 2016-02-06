@@ -75,6 +75,51 @@ class GraphScene(bpy.types.Operator):
                     elif object.type == "LAMP":
                         
                         newObjectNode.color = [1.000000, 0.936002, 0.395156]
+                        
+                    elif object.type == "CAMERA":
+                        
+                        newObjectNode.color = [0.559601, 0.559601, 0.559601]
+                        
+                    elif object.type == "ARMATURE":
+                        
+                        newObjectNode.color = [1.000000, 0.540677, 0.540677]
+                        
+                    elif object.type == "CURVE":
+                        
+                        newObjectNode.color = [0.612701, 0.538002, 1.000000]
+                        
+                    elif object.type == "LATTICE":
+                    
+                        newObjectNode.color = [0.437112, 0.949936, 1.000000]
+                    
+                    elif object.type == "META":
+                    
+                        newObjectNode.color = [0.781788, 0.528533, 1.000000]
+                        
+                    elif object.type == "EMPTY":
+                        
+                        newObjectNode.color = [1.000000, 1.000000, 1.000000]
+                        
+                    elif object.type == "SURFACE":
+                    
+                        newObjectNode.color = [0.171771, 1.000000, 0.542676]
+                    
+                    elif object.type == "FONT":
+                    
+                        newObjectNode.color = [0.437112, 0.642244, 1.000000]
+                        
+                    elif object.type == "SPEAKER":
+                                        
+                        newObjectNode.color = [0.000000, 0.630769, 0.542676]
+#                        
+
+#                        bpy.types.Scene.graph_meta_objects = bpy.props.BoolProperty(default=True)
+#                        bpy.types.Scene.graph_empty_objects = bpy.props.BoolProperty(default=True)
+#                        bpy.types.Scene.graph_surface_objects = bpy.props.BoolProperty(default=True)
+#                        bpy.types.Scene.graph_font_objects = bpy.props.BoolProperty(default=True)
+#                        bpy.types.Scene.graph_speaker_objects = bpy.props.BoolProperty(default=True)
+                                                
+                        
                                     
                     if object.parent == None:
                         
