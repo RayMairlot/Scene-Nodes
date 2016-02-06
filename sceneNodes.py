@@ -157,35 +157,37 @@ class GraphScene(bpy.types.Operator):
                     
                         for materialSlot in object.material_slots:
                             
-                            #print("Looking on object "+object.name+", node "+newObjectNode.name)
+                            if materialSlot.material:
                             
-                            objectMaterial = materialSlot.material
+                                #print("Looking on object "+object.name+", node "+newObjectNode.name)
+                            
+                                objectMaterial = materialSlot.material
                                                                     
-                            for material in bpy.data.materials:
-                                
-                                if objectMaterial.name == material.name:
-                                                                
-                                    #If material node doesn't already exist
-                                    if material.name not in nodeGroup.nodes:
-                                                                                                
-                                        newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
-                                        newMaterialNode.materialIndex = material.name
-                                        newMaterialNode.select = False
-                                        newMaterialNode.location[1] = newObjectNode.location[1]
-                                        newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
-                                        newMaterialNode.name = material.name                                
-                                        newMaterialNode.use_custom_color = True                   
-                                        newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
+                                for material in bpy.data.materials:
                                     
-                                        input = newMaterialNode.inputs[0]
-                                                            
-                                    else:
+                                    if objectMaterial.name == material.name:
+                                                                    
+                                        #If material node doesn't already exist
+                                        if material.name not in nodeGroup.nodes:
+                                                                                                    
+                                            newMaterialNode = nodeGroup.nodes.new('MaterialNodeType')
+                                            newMaterialNode.materialIndex = material.name
+                                            newMaterialNode.select = False
+                                            newMaterialNode.location[1] = newObjectNode.location[1]
+                                            newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
+                                            newMaterialNode.name = material.name                                
+                                            newMaterialNode.use_custom_color = True                   
+                                            newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
                                         
-                                        input = nodeGroup.nodes[material.name].inputs[0]                  
-                            
-                                print(newObjectNode.name)
-                                nodeGroup.links.new(input, newObjectNode.outputs[1])
-                                               
+                                            input = newMaterialNode.inputs[0]
+                                                                
+                                        else:
+                                            
+                                            input = nodeGroup.nodes[material.name].inputs[0]                  
+                                
+                                    print(newObjectNode.name)
+                                    nodeGroup.links.new(input, newObjectNode.outputs[1])
+                                                       
                             
         context.scene.graphing = False
             
