@@ -292,27 +292,30 @@ class ObjectNode(Node, MyCustomTreeNode):
 
     def update(self):
         
-        #print("updating node: ", self.name, len(self.inputs[0].links))
-        
         scene = bpy.data.scenes[self.scene]
         
-        if len(self.inputs[0].links) != 1:
-                        
-            scene.objects[self.objectIndex].parent = None
-                        
-            nodeGroup = bpy.data.node_groups['NodeTree']
+        if not scene.graphing:
+        
+            #print("updating node: ", self.name, len(self.inputs[0].links))
             
-            nodeGroup.links.new(self.inputs[0], nodeGroup.nodes[scene.name].outputs[0])  
-            
-        else:
-            
-            parentName = self.inputs[0].links[0].from_node.name
-                                    
-            #print(parentName)
-            
-            if parentName != "Scene":
-            
-                scene.objects[self.objectIndex].parent = scene.objects[parentName]
+            #If the object has been unlinked, link it to the scene node
+            if len(self.inputs[0].links) != 1:
+                            
+                scene.objects[self.objectIndex].parent = None
+                            
+                nodeGroup = bpy.data.node_groups['NodeTree']
+                
+                nodeGroup.links.new(self.inputs[0], nodeGroup.nodes[scene.name].outputs[0])  
+                
+            else:
+                
+                parentName = self.inputs[0].links[0].from_node.name
+                                        
+                #print(parentName)
+                
+                if parentName != "Scene":
+                
+                    scene.objects[self.objectIndex].parent = scene.objects[parentName]
         
 
     # Copy function to initialize a copied node from an existing one.
