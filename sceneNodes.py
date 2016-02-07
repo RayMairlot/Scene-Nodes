@@ -3,6 +3,20 @@ from bpy.types import NodeTree, Node, NodeSocket
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
+
+
+bl_info = {
+    "name": "Scene nodes",
+    "author": "Ray Mairlot",
+    "version": (1, 0),
+    "blender": (2, 76, 0),
+    "location": "Node Editor> Header> Scene Nodes",
+    "description": "Get an overview of the scene with nodes",
+    "category": "Node"
+    }
+
+
+
 bpy.types.Scene.graphing = bpy.props.BoolProperty(default=False)
 bpy.types.Scene.appended_header = bpy.props.BoolProperty(default=False)
 
@@ -265,7 +279,7 @@ class ObjectNode(Node, MyCustomTreeNode):
     bl_icon = 'OBJECT_DATA'
 
     objectIndex = bpy.props.StringProperty()
-    scene = bpy.props.StringProperty(default=bpy.data.scenes[0].name)
+    scene = bpy.props.StringProperty()
     
     def init(self, context):
                 
@@ -443,9 +457,7 @@ node_categories = [
         # which are applied to new nodes
         # NB: settings values are stored as string expressions,
         # for this reason they should be converted to strings using repr()
-        NodeItem("ObjectNodeType", label="Cube", settings={
-            "scene": repr(bpy.context.scene.name)
-            })
+        NodeItem("ObjectNodeType", label="Cube")
         ]),
     ]
 
@@ -483,9 +495,9 @@ def register():
     bpy.utils.register_module(__name__)    
     
     #Only appends the header once during development
-    if not bpy.context.scene.appended_header:
-        bpy.types.NODE_HT_header.append(SceneNodesHeader)
-        bpy.context.scene.appended_header = True    
+#    if not bpy.context.scene.appended_header:
+    bpy.types.NODE_HT_header.append(SceneNodesHeader)
+#        bpy.context.scene.appended_header = True    
 
     if 'SCENE_NODES' in nodeitems_utils._node_categories:
         nodeitems_utils.unregister_node_categories("SCENE_NODES")
@@ -505,5 +517,5 @@ def unregister():
 #    register()
 #    
 
-register()    
+#register()    
 #bpy.types.NODE_HT_header.append(SceneNodesHeader)    
