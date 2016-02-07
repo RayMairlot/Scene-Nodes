@@ -490,6 +490,40 @@ def SceneNodesHeader(self, context):
     
 
 
+class SceneNodesPreferences(bpy.types.AddonPreferences):
+    bl_idname = __name__  
+        
+    mesh_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    camera_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    lamp_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    armature_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    curve_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    lattice_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    meta_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    empty_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    surface_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    font_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    speaker_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    material_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+    
+    def draw(self, context):
+        layout = self.layout
+        
+        row = layout.row()
+        row.label(text="Node colours:")
+        
+        nodeTypes = ["mesh", "camera", "lamp", "armature", "curve", "lattice", "meta", "empty", "surface", "font", "speaker", "material"]
+                
+        row = layout.row()
+        
+        for nodeIndex, node in enumerate(nodeTypes):    
+            
+            if nodeIndex % 2 == 0:
+                row = layout.row()
+                row.prop(self, node+"_node_colour", text=node.capitalize()+" node")
+                row.prop(self, nodeTypes[nodeIndex+1]+"_node_colour", text=nodeTypes[nodeIndex+1].capitalize()+" node")
+            
+
 def register():
 
     bpy.utils.register_module(__name__)    
