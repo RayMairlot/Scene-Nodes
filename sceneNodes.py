@@ -475,19 +475,15 @@ def SceneNodesHeader(self, context):
     
     if context.scene.graph_filtering:
     
-        row.prop(context.scene, "graph_mesh_objects", text="", toggle=True, icon="MESH_DATA")
-        row.prop(context.scene, "graph_camera_objects", text="", toggle=True, icon="CAMERA_DATA")
-        row.prop(context.scene, "graph_lamp_objects", text="", toggle=True, icon="LAMP_DATA")
-        row.prop(context.scene, "graph_armature_objects", text="", toggle=True, icon="ARMATURE_DATA")
-        row.prop(context.scene, "graph_curve_objects", text="", toggle=True, icon="CURVE_DATA")
-        row.prop(context.scene, "graph_lattice_objects", text="", toggle=True, icon="LATTICE_DATA")
-        row.prop(context.scene, "graph_meta_objects", text="", toggle=True, icon="META_DATA")
-        row.prop(context.scene, "graph_empty_objects", text="", toggle=True, icon="EMPTY_DATA")
-        row.prop(context.scene, "graph_surface_objects", text="", toggle=True, icon="SURFACE_DATA")
-        row.prop(context.scene, "graph_font_objects", text="", toggle=True, icon="FONT_DATA")
+        nodeTypes = ["mesh", "camera", "lamp", "armature", "curve", "lattice", "meta", "empty", "surface", "font"]
+        
+        for node in nodeTypes:
+            
+            row.prop(context.scene, "graph_"+node+"_objects", text="", toggle=True, icon=node.upper()+"_DATA")
+        
         row.prop(context.scene, "graph_speaker_objects", text="", toggle=True, icon="SPEAKER")
         row.prop(context.scene, "graph_materials", text="", toggle=True, icon="MATERIAL_DATA")
-    
+        
 
 
 class SceneNodesPreferences(bpy.types.AddonPreferences):
