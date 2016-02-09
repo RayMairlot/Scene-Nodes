@@ -75,56 +75,15 @@ class GraphScene(bpy.types.Operator):
                     newObjectNode.select = False
                     newObjectNode.name = object.name
                     newObjectNode.use_custom_color = True
+                    newObjectNode.color = getattr(bpy.context.user_preferences.addons['sceneNodes'].preferences, object.type.lower()+"_node_colour")
                    
                     #print("Correct: Looking on object "+object.name+", node "+newObjectNode.name)
                                                                     
                     if object.type == "MESH":
-                        
-                        newObjectNode.color = [1.000000, 0.792470, 0.552983]
-                        
+                                                
                         newObjectNode.outputs.new('NodeSocketFloat', "Material")
-                        
-                    elif object.type == "LAMP":
-                        
-                        newObjectNode.color = [1.000000, 0.936002, 0.395156]
-                        
-                    elif object.type == "CAMERA":
-                        
-                        newObjectNode.color = [0.559601, 0.559601, 0.559601]
-                        
-                    elif object.type == "ARMATURE":
-                        
-                        newObjectNode.color = [1.000000, 0.540677, 0.540677]
-                        
-                    elif object.type == "CURVE":
-                        
-                        newObjectNode.color = [0.612701, 0.538002, 1.000000]
-                        
-                    elif object.type == "LATTICE":
-                    
-                        newObjectNode.color = [0.437112, 0.949936, 1.000000]
-                    
-                    elif object.type == "META":
-                    
-                        newObjectNode.color = [0.781788, 0.528533, 1.000000]
-                        
-                    elif object.type == "EMPTY":
-                        
-                        newObjectNode.color = [1.000000, 1.000000, 1.000000]
-                        
-                    elif object.type == "SURFACE":
-                    
-                        newObjectNode.color = [0.171771, 1.000000, 0.542676]
-                    
-                    elif object.type == "FONT":
-                    
-                        newObjectNode.color = [0.437112, 0.642244, 1.000000]
-                        
-                    elif object.type == "SPEAKER":
-                                        
-                        newObjectNode.color = [0.000000, 0.630769, 0.542676]
-                                                                        
-                                    
+
+                           
                     if object.parent == None:
                         
                         newObjectNode.location[1] = (yOffset * -140) - (totalHeight/2) + 12
@@ -181,7 +140,8 @@ class GraphScene(bpy.types.Operator):
                                             newMaterialNode.location[0] = newObjectNode.location[0] + newObjectNode.width + 120
                                             newMaterialNode.name = material.name                                
                                             newMaterialNode.use_custom_color = True                   
-                                            newMaterialNode.color = [1.000000, 0.608448, 0.993887] 
+                                            #Have to use getattr as it "doesn't support ID properties"
+                                            newMaterialNode.color = getattr(bpy.context.user_preferences.addons['sceneNodes'].preferences, "material_node_colour")
                                         
                                             input = newMaterialNode.inputs[0]
                                                                 
@@ -487,19 +447,21 @@ def SceneNodesHeader(self, context):
 class SceneNodesPreferences(bpy.types.AddonPreferences):
     bl_idname = __name__  
         
-    mesh_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    camera_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    lamp_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    armature_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    curve_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    lattice_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    meta_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    empty_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    surface_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    font_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    speaker_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
-    material_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1)
+        
+    mesh_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=    [1.000000, 0.792470, 0.552983])
+    camera_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=  [0.559601, 0.559601, 0.559601])
+    lamp_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=    [1.000000, 0.936002, 0.395156])
+    armature_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=[1.000000, 0.540677, 0.540677])
+    curve_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=   [0.612701, 0.538002, 1.000000])
+    lattice_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default= [0.437112, 0.949936, 1.000000])
+    meta_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=    [0.781788, 0.528533, 1.000000])
+    empty_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=   [1.000000, 1.000000, 1.000000])
+    surface_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default= [0.171771, 1.000000, 0.542676])
+    font_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=    [0.437112, 0.642244, 1.000000])
+    speaker_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default= [0.000000, 0.630769, 0.542676])
+    material_node_colour = bpy.props.FloatVectorProperty(subtype="COLOR", min=0, max=1, default=[1.000000, 0.608448, 0.993887])
     
+        
     def draw(self, context):
         layout = self.layout
         
