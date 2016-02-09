@@ -22,18 +22,16 @@ bpy.types.Scene.appended_header = bpy.props.BoolProperty(default=False)
 
 bpy.types.Scene.graph_filtering = bpy.props.BoolProperty(default=False)
 
-bpy.types.Scene.graph_mesh_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_camera_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_lamp_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_armature_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_curve_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_lattice_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_meta_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_empty_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_surface_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_font_objects = bpy.props.BoolProperty(default=True)
-bpy.types.Scene.graph_speaker_objects = bpy.props.BoolProperty(default=True)
+
+nodeTypes = ["mesh", "camera", "lamp", "armature", "curve", "lattice", "meta", "empty", "surface", "font", "speaker", "material"]
+
+for node in nodeTypes:
+    
+    setattr(bpy.types.Scene, "graph_"+node+"_objects", bpy.props.BoolProperty(default=True))
+
 bpy.types.Scene.graph_materials = bpy.props.BoolProperty(default=True)
+
+
 
 class GraphScene(bpy.types.Operator):
     """Add a simple box mesh"""
